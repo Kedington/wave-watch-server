@@ -1,15 +1,15 @@
 import os
-from flask import Flask, request, send_from_directory, flash, redirect, url_for
 
-UPLOAD_FOLDER = '/Users/kevin/WaveWatch/wave-watch-server/uploads'
+from flask import Flask, request, send_from_directory, flash, redirect, url_for
+from utils import allowed_file, generate_filename
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config.from_object("config")
 
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return 'Wave Watch'
 
 
 @app.route('/file', methods=['GET', 'POST'])
@@ -25,8 +25,8 @@ def upload_file():
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
-        else:
-            filename = "test.mov"
+        elif file and allowed_file(file.filename):
+            filename = generate_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(url_for('uploaded_file',
                                     filename=filename))
