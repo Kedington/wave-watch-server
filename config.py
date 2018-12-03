@@ -12,3 +12,4 @@ DEBUG = True
 PORT = 5000
 
 UPLOAD_FOLDER = '/Users/kevin/WaveWatch/wave-watch-server/uploads'
+DATABASE = '/users/kevin/WaveWatch/wave-watch-server/database.db'

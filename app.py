@@ -2,6 +2,8 @@ import os
 
 from flask import Flask, request, send_from_directory, flash, redirect, url_for
 from utils import allowed_file, generate_filename
+from db import get_db, query_db, close_db
+
 
 app = Flask(__name__)
 app.config.from_object("config")
@@ -10,6 +12,22 @@ app.config.from_object("config")
 @app.route('/')
 def hello_world():
     return 'Wave Watch'
+
+
+@app.route('/db/insert')
+def db_test():
+    db = get_db()
+    db.execute("INSERT INTO IMAGE (NAME, LONGITUDE, LATITUDE) VALUES (?, ?, ?)", [generate_filename("test.jpg"), 15, 25])
+    db.commit()
+    return 'Insert Successful'
+
+
+@app.route('/db/select')
+def db_get():
+    string = ""
+    for item in query_db("select * from image"):
+        string = string + str(item) + "\n"
+    return string
 
 
 @app.route('/file', methods=['GET', 'POST'])
@@ -45,6 +63,12 @@ def upload_file():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'],
                                filename)
+
+
+@app.teardown_appcontext
+def close_app(exception):
+    print("Closed DB")
+    close_db()
 
 
 if __name__ == '__main__':
